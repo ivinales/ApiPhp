@@ -1,0 +1,12 @@
+# Dependencias de Composer
+/vendor/
+composer.lock
+
+# Cache de PHPUnit
+.phpunit.result.cache
+
+# Docker
+docker-compose.override.yml
+
+# VSCode
+.vscode/
