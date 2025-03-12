@@ -13,11 +13,8 @@ WORKDIR /var/www
 # Copiar el código fuente al contenedor
 COPY . .
 
-# Copiar el entrypoint para ejecución automática
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Usar el entrypoint para ejecutar comandos automáticamente al iniciar
-ENTRYPOINT ["/entrypoint.sh"]
+# Dar permisos adecuados
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www
 
 CMD ["php-fpm"]

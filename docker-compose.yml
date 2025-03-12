@@ -10,6 +10,31 @@ services:
       - "9000"
     depends_on:
       - mysql
+    command: >
+      sh -c "
+      echo 'Iniciando configuración inicial...' &&
+
+      echo 'Esperando a que MySQL esté listo...' &&
+      until nc -z -v -w30 mysql 3306; do
+        echo 'MySQL aún no está listo...'
+        sleep 5
+      done &&
+      echo 'MySQL está listo!' &&
+
+      if [ ! -d 'vendor' ]; then
+        echo 'Instalando dependencias de Composer...' &&
+        composer install --no-interaction --optimize-autoloader &&
+        composer require symfony/cache &&
+        composer require --dev phpunit/phpunit
+      else
+        echo 'Dependencias de Composer ya instaladas, saltando instalación.'
+      fi &&
+
+      echo 'Actualizando esquema de base de datos con Doctrine...' &&
+      vendor/bin/doctrine orm:schema-tool:update --force --complete &&
+
+      echo 'Configuración completa. Iniciando PHP-FPM...' &&
+      php-fpm"
 
   nginx:
     image: nginx:latest
@@ -32,3 +57,4 @@ services:
       MYSQL_PASSWORD: pass123
     ports:
       - "3306:3306"
+    
